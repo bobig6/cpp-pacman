@@ -21,9 +21,9 @@ private:
     // Pacman's desired direction.
     MoveDirection nextMoveDirection = MoveDirection::None;
 
-    // The tile pacman is currently in.
+    // The tile pacman is currently in; representing the beginning position
     sf::Vector2f currentTile;
-    // The tile pacman is moving to.
+    // The tile pacman is moving to; representing the target position
     sf::Vector2f nextTile;
 
     // How long it takes to move between tiles.
@@ -35,18 +35,21 @@ private:
     float animationEndTime = 0.1f; // seconds per frame
     int currentFrame = 0;
 
-    void UpdateAnimation(float deltaTime);
 
+    void UpdateAnimation(float deltaTime);
 
     // Move pacman towards the next tile.
     // Return true if pacman reached the next tile.
     bool MoveTo(float deltaTime);
 
 public:
-    bool HasEatenFruit(sf::Vector2f tile);
     void EatFruits(sf::Vector2f p);
+    bool HasEatenFruit(sf::Vector2f p);
     void EatGhost();
+    void EatEnergizer(sf::Vector2f p);
+    bool HasEatenEnergizer(sf::Vector2f p);
     void Move(float deltaTime);
+    sf::Vector2f GetPosition();
     void DrawPacman(sf::RenderWindow& window);
     void Die();
     Pacman();

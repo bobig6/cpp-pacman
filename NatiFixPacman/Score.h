@@ -5,14 +5,14 @@ extern int currentScore;
 
 class Score
 {
-public:
+private:
 	sf::Font font;
 	sf::Text text;
 
+public:
 	Score();
 
 	void UpdateScore(sf::RenderWindow& window);
-private:
-
 };
+
 
