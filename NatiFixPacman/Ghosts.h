@@ -1,7 +1,8 @@
 #pragma once
 #include <SFML/Graphics.hpp>
+#include "Timers.h"
 
-enum class RandomDirection
+enum class Direction
 {
 	None,
 	Up,
@@ -20,10 +21,13 @@ enum class GhostMode
 class Ghosts
 {
 private:
+	//sf::Texture frightenedTexture;
+	//sf::Sprite frightenedSprite;
+
 	// Ghost's current direction.
-	RandomDirection currentMoveDirection = RandomDirection::None;
+	Direction currentMoveDirection = Direction::None;
 	// Ghost's desired direction.
-	RandomDirection nextMoveDirection = RandomDirection::None;
+	Direction nextMoveDirection = Direction::None;
 
 	// The tile ghost is currently in.
 	sf::Vector2f currentTile;
@@ -40,27 +44,27 @@ private:
 	float animationEndTime = 0.1f; // Animation frame duration
 	int currentFrame = 0;
 
-	
+	bool scatterMode = false;
 
 protected:
 	sf::Texture ghostTexture;
 	sf::Sprite ghostSprite;
 
-	float frightenedTime = 7.0f;
-	float frightenedTimer = 0.f;
+	sf::Texture defaultTexture;
 
-	GhostMode mode;
+	GhostMode mode = GhostMode::Chase;
+	Timers modeTimer;
 
 	Ghosts(const std::string& texturePath, char a);
 
 public:
-	RandomDirection OppositeDirection(RandomDirection dir);
-	void Move(float deltaTime, const sf::Vector2f& pacmanPos);
+	Direction OppositeDirection(Direction dir);
+	void Move(float deltaTime, const sf::Vector2f& pacmanPos, const sf::Vector2f& ghostPos = {0.f, 0.f});
 	bool MoveTo(float deltaTime);
 	void MapSearch(char a, sf::Sprite& sprite);
 	void Draw(sf::RenderWindow& window);
 	virtual sf::Vector2f getTargetPosition(const sf::Vector2f& pacmanPos) = 0;
 	sf::Vector2f getPosition() const;
-	void SetGhostMode(GhostMode value);
+	void setMode(GhostMode newMode);
 };
 

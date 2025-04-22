@@ -2,6 +2,8 @@
 #include "Map.h"
 #include "Constants.h"
 #include "Score.h"
+#include "Timers.h"
+#include <iostream>
 
 sf::Vector2f WrapCoords(const sf::Vector2f& p)
 {
@@ -11,7 +13,7 @@ sf::Vector2f WrapCoords(const sf::Vector2f& p)
     return { std::fmod(p.x + sw, sw), std::fmod(p.y + sh, sh) };
 }
 
-sf::Vector2i ConvertCoordinates(sf::Vector2f p)
+sf::Vector2i ConvertCoordinates(sf::Vector2f p) 
 {
 
     p = WrapCoords(p);
@@ -30,6 +32,16 @@ void Pacman::EatFruits(sf::Vector2f p)
     currentScore++;
 }
 
+void Pacman::SetGhosts(Ghosts& blinky, Ghosts& pinky, Ghosts& inky, Ghosts& clyde)
+{
+    ghosts[0] = &blinky;
+    ghosts[1] = &pinky;
+    ghosts[2] = &inky;
+    ghosts[3] = &clyde;
+}
+
+
+
 bool Pacman::HasEatenFruit(sf::Vector2f p)
 {
     sf::Vector2i indexes = ConvertCoordinates(p);
@@ -39,15 +51,19 @@ bool Pacman::HasEatenFruit(sf::Vector2f p)
 
 void Pacman::EatEnergizer(sf::Vector2f p)
 {
+
     sf::Vector2i indexes = ConvertCoordinates(p);
 
     maze[indexes.x][indexes.y] = ' ';
     currentScore++;
 
-    // set the ghosts into frightened mode
+    for (int i = 0; i < 4; i++) {
+        ghosts[i]->setMode(GhostMode::Frightened);
+    }
+
 }
 
-bool Pacman::HasEatenEnergizer(sf::Vector2f p) 
+bool Pacman::HasEatenEnergizer(sf::Vector2f p)
 {
     sf::Vector2i indexes = ConvertCoordinates(p);
 
@@ -72,14 +88,6 @@ void Pacman::DrawPacman(sf::RenderWindow& window) //self explanatory
     // Restore the sprite's current position.
     pacmanSprite.setPosition(currentPosition);
 }
-
-//void Pacman::SetGhosts(Ghosts* blinky, Ghosts* pinky, Ghosts* inky, Ghosts* clyde)
-//{
-//    ghosts[0] = blinky;
-//    ghosts[1] = pinky;
-//    ghosts[2] = inky;
-//    ghosts[3] = clyde;
-//}
 
 sf::Vector2f GetNextTile(MoveDirection dir)
 {
@@ -156,7 +164,7 @@ bool Pacman::MoveTo(float deltaTime)
         sf::Vector2f newPosition = currentTile + t * (nextTile - currentTile); //the distance between the current and next tile; linear interpolation
         pacmanSprite.setPosition(WrapCoords(newPosition));
     }
-    return interpolationTimer >= interpolationTime;
+    return interpolationTimer >= interpolationTime; 
 }
 
 void Pacman::Move(float deltaTime)
@@ -171,6 +179,7 @@ void Pacman::Move(float deltaTime)
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
         nextMoveDirection = MoveDirection::Right;
 
+
     // Move pacman towards the next tile.
     if (MoveTo(deltaTime))
     {
@@ -181,7 +190,7 @@ void Pacman::Move(float deltaTime)
             EatFruits(currentTile);
         }
 
-        if (HasEatenEnergizer(currentTile)) 
+        if (HasEatenEnergizer(currentTile))
         {
             EatEnergizer(currentTile);
         }
@@ -207,8 +216,6 @@ void Pacman::Move(float deltaTime)
 
     UpdateAnimation(deltaTime);
 }
-
-
 
 sf::Vector2f Pacman::GetPosition()
 {

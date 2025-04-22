@@ -1,8 +1,9 @@
 #include "Clyde.h"
 #include "Pacman.h"
 #include "Constants.h"
+#include "Blinky.h"
 
-void Clyde::setBlinkyPos(sf::Vector2f newBlinkyPos)
+void Clyde::GetBlinkyPos(sf::Vector2f newBlinkyPos)
 {
     blinkyPos = newBlinkyPos;
 }

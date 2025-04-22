@@ -1,7 +1,7 @@
 #pragma once
 #include <SFML/Graphics.hpp>
 
-class Pellets
+class Pellets 
 {
 private:
 	int collectedFood = 0;
@@ -9,7 +9,7 @@ private:
 	sf::Texture pelletsTexture;
 	sf::Sprite pelletsSprite;
 
-public:
+public: 
 	void DrawPellets(sf::RenderWindow& window);
 	Pellets();
 };

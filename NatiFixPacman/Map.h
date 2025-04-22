@@ -8,7 +8,7 @@ const int columns = 22;
 extern char maze[rows][columns];
 
 class Map {
-private:
+private: 	
 	sf::Texture texture;
 	sf::Sprite wallSprite;
 public:

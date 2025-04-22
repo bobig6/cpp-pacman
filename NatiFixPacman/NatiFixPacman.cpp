@@ -7,6 +7,7 @@
 #include "Pinky.h"
 #include "Inky.h"
 #include "Clyde.h"
+#include "Ghosts.h"
 
 #include <SFML/Graphics.hpp>
 
@@ -16,7 +17,6 @@ int main()
     sf::RenderWindow window(sf::VideoMode({ 672,672 }), "Pacman");
 
     sf::Clock clock;
-
 
     //speed of pacman
     //window.setFramerateLimit(200);
@@ -32,6 +32,7 @@ int main()
     Inky inky;
     Clyde clyde;
 
+    pacman.SetGhosts(blinky, pinky, inky, clyde);
 
     //keeping the window on
     while (window.isOpen())
@@ -42,14 +43,10 @@ int main()
                 window.close();
         }
 
-        
-
         sf::Time elapsedTime = clock.restart();
 
         //implementing functions
         pacman.Move(elapsedTime.asSeconds());
-
-        clyde.setBlinkyPos(blinky.getPosition());
         blinky.Move(elapsedTime.asSeconds(), blinky.getTargetPosition(pacman.GetPosition()));
         pinky.Move(elapsedTime.asSeconds(), pinky.getTargetPosition(pacman.GetPosition()));
         clyde.Move(elapsedTime.asSeconds(), clyde.getTargetPosition(pacman.GetPosition()));

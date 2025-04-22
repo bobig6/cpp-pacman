@@ -44,6 +44,6 @@ void Map::DrawMap(unsigned int x, unsigned int y, sf::RenderWindow& window)
 	}
 }
 
-Map::Map() : texture("assets/stena1.png"), wallSprite(texture)
+Map::Map() : texture("assets/stena1.png"), wallSprite(texture) 
 {
 }

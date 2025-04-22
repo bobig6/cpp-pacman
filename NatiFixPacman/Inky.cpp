@@ -1,6 +1,5 @@
 #include "Inky.h"
 #include "Constants.h"
-#include <iostream>
 
 bool Inky::Scatter()
 {
@@ -26,11 +25,11 @@ sf::Vector2f Inky::getTargetPosition(const sf::Vector2f& pacmanPos)
 	{
 		localScatterMode = true;
 	}
-	else if (distanceCorner < 4*blockSize)
+	else if (distanceCorner < 4 * blockSize)
 	{
 		localScatterMode = false;
 	}
-	
+
 	if (localScatterMode)
 	{
 		return cornerPosition;
