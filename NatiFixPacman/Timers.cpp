@@ -28,4 +28,3 @@ float Timers::Time()
 {
 	return timeLeft;
 }
-

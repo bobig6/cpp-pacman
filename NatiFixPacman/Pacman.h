@@ -36,7 +36,7 @@ private:
     float animationEndTime = 0.1f; // seconds per frame
     int currentFrame = 0;
 
-    Ghosts *ghosts[4];
+    Ghosts* ghosts[4];
 
     void UpdateAnimation(float deltaTime);
 
@@ -45,16 +45,17 @@ private:
     bool MoveTo(float deltaTime);
 
 public:
-    void SetGhosts(Ghosts &blinky, Ghosts& pinky, Ghosts& inky, Ghosts& clyde);
+    void SetGhosts(Ghosts& blinky, Ghosts& pinky, Ghosts& inky, Ghosts& clyde);
     void EatFruits(sf::Vector2f p);
     bool HasEatenFruit(sf::Vector2f p);
+    Ghosts* HasEatenGhost(sf::Vector2f p);
     void EatEnergizer(sf::Vector2f p);
     bool HasEatenEnergizer(sf::Vector2f p);
-    void EatGhost();
-    void Move(float deltaTime);
+    void EatGhost(Ghosts* ghost);
+    bool Move(float deltaTime);
     sf::Vector2f GetPosition();
     void DrawPacman(sf::RenderWindow& window);
+    void Reset();
     void Die();
     Pacman();
 };
-

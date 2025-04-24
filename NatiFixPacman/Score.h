@@ -13,6 +13,7 @@ public:
 		Score();
 
 		void UpdateScore(sf::RenderWindow& window);
+		void Reset();
 };
 
 

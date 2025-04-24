@@ -11,7 +11,7 @@ sf::Vector2f WrapCoords2(const sf::Vector2f& p)
     return { std::fmod(p.x + sw, sw), std::fmod(p.y + sh, sh) };
 }
 
-sf::Vector2i ConvertCoordinates2(sf::Vector2f p) 
+sf::Vector2i ConvertCoordinates2(sf::Vector2f p)
 {
 
     p = WrapCoords2(p);
@@ -49,7 +49,7 @@ sf::Vector2f GetNextTile(Direction dir)
     return { 0, 0 };
 }
 
-void Ghosts::setMode(GhostMode newMode) 
+void Ghosts::setMode(GhostMode newMode)
 {
     // Change the mode of the ghost
     mode = newMode;
@@ -69,23 +69,11 @@ void Ghosts::setMode(GhostMode newMode)
     }
 }
 
-
-
-//void Ghosts::PacmanEatsEnergizer(std::vector<Ghosts>& ghosts, Timers& frightenedTimer, float frightenedDuration, Pacman& pacman) 
-//{
-//    frightenedTimer.FrightenedTimer(frightenedDuration);
-//
-//    for (auto& ghost : ghosts) 
-//    {
-//        ghost.setMode(GhostMode::Frightened);
-//    }
-//
-//    std::cout << "Ghosts are frightened!" << std::endl;
-//
-//    if (pacman.hasEatenEnergizer) {
-//        PacmanEatsEnergizer(ghosts, frightenedTimer, 7.f); // 7 seconds of frightened mode
-//    }
-//}
+void Ghosts::ResetGhost()
+{
+    setMode(GhostMode::Chase);
+    MapSearch();
+}
 
 Direction Ghosts::OppositeDirection(Direction dir) //this returns the opposite of the last direction that I have been in
 {
@@ -98,11 +86,11 @@ Direction Ghosts::OppositeDirection(Direction dir) //this returns the opposite o
     }
 }
 
-bool Ghosts::MoveTo(float deltaTime) 
+bool Ghosts::MoveTo(float deltaTime)
 {
     interpolationTimer += deltaTime;
 
-    if (interpolationTime > 0.0f) 
+    if (interpolationTime > 0.0f)
     {
         float t = std::min(1.0f, interpolationTimer / interpolationTime);
         sf::Vector2f newPosition = currentTile + t * (nextTile - currentTile);
@@ -111,15 +99,15 @@ bool Ghosts::MoveTo(float deltaTime)
     return interpolationTimer >= interpolationTime;
 }
 
-void Ghosts::Move(float deltaTime, const sf::Vector2f& pacmanPos, const sf::Vector2f& ghostPos) 
+void Ghosts::Move(float deltaTime, const sf::Vector2f& pacmanPos, const sf::Vector2f& ghostPos)
 {
     // update the timer of the ghost
     modeTimer.Update(deltaTime);
     // Check the mode timer and adjust the mode if necessary
-    std::cout << modeTimer.Time() << std::endl;
+    //std::cout << modeTimer.Time() << std::endl;
     if (modeTimer.Time() < 0.f) {
         switch (mode)
-        {   
+        {
         case GhostMode::Scatter:
             setMode(GhostMode::Chase);
             break;
@@ -164,7 +152,7 @@ void Ghosts::Move(float deltaTime, const sf::Vector2f& pacmanPos, const sf::Vect
                     }
                 }
             }
-            
+
         }
 
 
@@ -184,20 +172,20 @@ void Ghosts::Move(float deltaTime, const sf::Vector2f& pacmanPos, const sf::Vect
     }
 }
 
-void Ghosts::MapSearch(char a, sf::Sprite& sprite)
+void Ghosts::MapSearch()
 {
     for (int i = 0; i < rows; i++)
     {
         for (int j = 0; j < columns; j++)
         {
-            if (maze[i][j] == a)
+            if (maze[i][j] == mapSymbol)
             {
                 float x = static_cast<float>(j * blockSize);
                 float y = static_cast<float>(i * blockSize);
 
                 currentTile = nextTile = sf::Vector2f{ x, y };
 
-                sprite.setPosition(currentTile);
+                ghostSprite.setPosition(currentTile);
             }
         }
     }
@@ -208,7 +196,7 @@ void Ghosts::Draw(sf::RenderWindow& window)
     window.draw(ghostSprite);
 }
 
-sf::Vector2f Ghosts::getPosition() const
+sf::Vector2f Ghosts::GetPosition() const
 {
     return ghostSprite.getPosition();
 }
@@ -216,9 +204,10 @@ sf::Vector2f Ghosts::getPosition() const
 Ghosts::Ghosts(const std::string& texturePath, char a)
     : ghostTexture(texturePath), modeTimer(7.f), defaultTexture(ghostTexture),
     ghostSprite(ghostTexture, sf::IntRect{ { 0,0, },{ 32, 32} })
-  /*  frightenedTexture("assets/frightened.png"), 
-    frightenedSprite(frightenedTexture)*/
+    /*  frightenedTexture("assets/frightened.png"),
+      frightenedSprite(frightenedTexture)*/
 {
     modeTimer.Start();
-    MapSearch(a, ghostSprite);
+    mapSymbol = a;
+    MapSearch();
 }

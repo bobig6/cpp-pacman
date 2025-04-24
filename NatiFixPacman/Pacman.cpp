@@ -24,13 +24,6 @@ sf::Vector2i ConvertCoordinates(sf::Vector2f p)
     return sf::Vector2i{ r,c };
 }
 
-void Pacman::EatFruits(sf::Vector2f p)
-{
-    sf::Vector2i indexes = ConvertCoordinates(p);
-
-    maze[indexes.x][indexes.y] = ' ';
-    currentScore++;
-}
 
 void Pacman::SetGhosts(Ghosts& blinky, Ghosts& pinky, Ghosts& inky, Ghosts& clyde)
 {
@@ -40,7 +33,13 @@ void Pacman::SetGhosts(Ghosts& blinky, Ghosts& pinky, Ghosts& inky, Ghosts& clyd
     ghosts[3] = &clyde;
 }
 
+void Pacman::EatFruits(sf::Vector2f p)
+{
+    sf::Vector2i indexes = ConvertCoordinates(p);
 
+    maze[indexes.x][indexes.y] = ' ';
+    currentScore++;
+}
 
 bool Pacman::HasEatenFruit(sf::Vector2f p)
 {
@@ -51,16 +50,17 @@ bool Pacman::HasEatenFruit(sf::Vector2f p)
 
 void Pacman::EatEnergizer(sf::Vector2f p)
 {
-
     sf::Vector2i indexes = ConvertCoordinates(p);
 
     maze[indexes.x][indexes.y] = ' ';
     currentScore++;
 
-    for (int i = 0; i < 4; i++) {
-        ghosts[i]->setMode(GhostMode::Frightened);
-    }
 
+    for (int i = 0; i < 4; i++) 
+    {
+        ghosts[i]->setMode(GhostMode::Frightened);
+
+    }
 }
 
 bool Pacman::HasEatenEnergizer(sf::Vector2f p)
@@ -70,10 +70,30 @@ bool Pacman::HasEatenEnergizer(sf::Vector2f p)
     return maze[indexes.x][indexes.y] == 'o';
 }
 
-void Pacman::EatGhost()
+Ghosts* Pacman::HasEatenGhost(sf::Vector2f p)
 {
-    //insert collision with ghosts only during booster
+    sf::Vector2i indexes = ConvertCoordinates(p);// Tile position of p
+    for (const auto& ghost : ghosts) { // Assuming ghosts is a std::vector<Ghosts>
+        // Get ghost's runtime pixel position and convert to tile position
+        sf::Vector2f ghostPos = ghost->GetPosition();
+        sf::Vector2i ghostTile = ConvertCoordinates(ghostPos);
+        if (ghostTile == indexes) {
+            std::cout << "collided with ghost" << std::endl;
+            return ghost; // Ghost is at this tile
+        }
+    }
+    return 0;
 }
+
+void Pacman::EatGhost(Ghosts* ghost)
+{
+    
+        currentScore += 200;
+        std::cout << "Eaten ghost" << std::endl;
+        ghost->ResetGhost();
+    
+}
+
 
 void Pacman::DrawPacman(sf::RenderWindow& window) //self explanatory
 {
@@ -136,6 +156,7 @@ void Pacman::UpdateAnimation(float deltaTime)
         currentAnimationPosition = 18;
         break;
     default:
+        currentAnimationPosition = 0;
         return;
     }
 
@@ -167,7 +188,7 @@ bool Pacman::MoveTo(float deltaTime)
     return interpolationTimer >= interpolationTime; 
 }
 
-void Pacman::Move(float deltaTime)
+bool Pacman::Move(float deltaTime)
 {
     // Update pacman's next move direction.
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Up))
@@ -179,6 +200,19 @@ void Pacman::Move(float deltaTime)
     if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Right))
         nextMoveDirection = MoveDirection::Right;
 
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::R))
+        nextMoveDirection = MoveDirection::Right;
+
+    Ghosts* res = HasEatenGhost(currentTile);
+    if (res != 0)
+    {
+        if (res->GetMode() == GhostMode::Frightened) {
+            EatGhost(res);
+        }
+        else {
+            return false;
+        }
+    }
 
     // Move pacman towards the next tile.
     if (MoveTo(deltaTime))
@@ -215,6 +249,7 @@ void Pacman::Move(float deltaTime)
     }
 
     UpdateAnimation(deltaTime);
+    return true;
 }
 
 sf::Vector2f Pacman::GetPosition()
@@ -225,10 +260,22 @@ sf::Vector2f Pacman::GetPosition()
 void Pacman::Die()
 {
     //collision with ghosts always when not in booster
+
 }
 
 Pacman::Pacman() : pacmanTexture("assets/Pacman.png"), pacmanSprite(pacmanTexture, sf::IntRect{ {0,0}, {32,32} })
 {
+    Reset();
+}
+
+void Pacman::Reset()
+{
+    currentMoveDirection = MoveDirection::None;
+    nextMoveDirection = MoveDirection::None;
+    currentFrame = 0;
+    animationTimer = 0;
+
+
     for (int i = 0; i < rows; i++)
     {
         for (int j = 0; j < columns; j++)
