@@ -31,7 +31,7 @@ const char mazeLayout[rows][columns] = { // P is Pacman's spawn point; 123 is ea
 };
 
 class Map {
-private: 	
+private:
 	sf::Texture texture;
 	sf::Sprite wallSprite;
 public:

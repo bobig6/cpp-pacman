@@ -45,17 +45,21 @@ private:
     bool MoveTo(float deltaTime);
 
 public:
+    int eatenPellets = 0;
+    int eatenEnergizers = 0;
+
     void SetGhosts(Ghosts& blinky, Ghosts& pinky, Ghosts& inky, Ghosts& clyde);
     void EatFruits(sf::Vector2f p);
     bool HasEatenFruit(sf::Vector2f p);
-    Ghosts* HasEatenGhost(sf::Vector2f p);
     void EatEnergizer(sf::Vector2f p);
     bool HasEatenEnergizer(sf::Vector2f p);
     void EatGhost(Ghosts* ghost);
     bool Move(float deltaTime);
     sf::Vector2f GetPosition();
+    sf::Sprite GetSprite() { return pacmanSprite; }
     void DrawPacman(sf::RenderWindow& window);
     void Reset();
+    void ResetGhosts();
     void Die();
     Pacman();
 };

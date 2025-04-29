@@ -9,6 +9,8 @@
 #include "Inky.h"
 #include "Clyde.h"
 #include "Ghosts.h"
+#include "Constants.h"
+#include "Lives.h"
 
 class Game
 {
@@ -22,11 +24,15 @@ class Game
     Pinky pinky;
     Inky inky;
     Clyde clyde;
+    Lives lives;
+
+    bool isRunning = true;
 
 
 public:
     Game();
     void Update(sf::RenderWindow& window, sf::Time& elapsedTime);
     void Reset();
+    void CheckLives();
+    void CheckWin();
 };
-

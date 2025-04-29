@@ -29,7 +29,7 @@ void Map::Reset()
 			maze[i][j] = mazeLayout[i][j];
 }
 
-Map::Map() : texture("assets/stena1.png"), wallSprite(texture) 
+Map::Map() : texture("assets/stena1.png"), wallSprite(texture)
 {
 	Reset();
 }
