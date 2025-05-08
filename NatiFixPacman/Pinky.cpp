@@ -6,6 +6,7 @@ sf::Vector2f Pinky::getTargetPosition(const sf::Vector2f& pacmanPos)
 {
 	if (mode == GhostMode::Scatter)
 	{
+		//getting the corresponding corner position to each ghost
 		return sf::Vector2f{ static_cast<float>(screenHeight), 0.f };
 	}
 

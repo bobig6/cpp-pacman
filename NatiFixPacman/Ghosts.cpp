@@ -9,8 +9,6 @@ bool CanMoveTo(sf::Vector2f p)
     return maze[indexes.x][indexes.y] != '#';
 }
 
-
-
 void Ghosts::setMode(GhostMode newMode)
 {
     // Change the mode of the ghost
@@ -81,9 +79,9 @@ void Ghosts::UpdateAnimation(float deltaTime)
         }
     }
     else {
-        // Force to a single frame (e.g., first frame of frightened texture)
+        //forcing to only one single frame for the frightened
         currentFrame = 0;
-        currentAnimationPosition = 0; // assuming frightened.png has only one frame in the first slot
+        currentAnimationPosition = 0;
     }
 
     int animationIndex = currentFrame + currentAnimationPosition;
@@ -95,6 +93,7 @@ void Ghosts::Move(float deltaTime, const sf::Vector2f& pacmanPos, const sf::Vect
     // update the timer of the ghost
     modeTimer.Update(deltaTime);
     // Check the mode timer and adjust the mode if necessary
+    // When the timer runs out, the mode changes depending on the setMode()
     if (modeTimer.Time() < 0.f) {
         switch (mode)
         {
@@ -120,8 +119,6 @@ void Ghosts::Move(float deltaTime, const sf::Vector2f& pacmanPos, const sf::Vect
         currentTile = WrapCoords(nextTile);
 
         //choosing direction toward Pacman
-        // if the ghost mode is Chase or Scatter, we are searching for the smallest position, so we set the current best to Max (+infinity). 
-        // in the other cases, we are searching for the biggest position, so we set the current best to Min (-infinity)
         float bestDist = 0.f;
 
         if (mode == GhostMode::Chase || mode == GhostMode::Scatter) {
@@ -164,7 +161,6 @@ void Ghosts::Move(float deltaTime, const sf::Vector2f& pacmanPos, const sf::Vect
 
         }
 
-
         if (bestDir != MoveDirection::None) {
             nextTile = currentTile + GetNextTile(bestDir);
             currentMoveDirection = bestDir;
@@ -174,9 +170,16 @@ void Ghosts::Move(float deltaTime, const sf::Vector2f& pacmanPos, const sf::Vect
             currentMoveDirection = MoveDirection::None;
         }
 
-        interpolationTime = std::abs(nextTile.x - currentTile.x) + std::abs(nextTile.y - currentTile.y) > 0
-            ? blockSize / moveSpeed
-            : 0.0f;
+        if (std::abs(nextTile.x - currentTile.x) + std::abs(nextTile.y - currentTile.y) > 0)
+        {
+            interpolationTime = blockSize / moveSpeed;
+        }
+        else
+        {
+            interpolationTime = 0.0f;
+        }
+
+        //we reset it after the loop again
         interpolationTimer = 0.0f;
     }
 
@@ -191,9 +194,11 @@ void Ghosts::MapSearch()
         {
             if (maze[i][j] == mapSymbol)
             {
+                //we calculate the x and y corresponding to the map position
                 float x = static_cast<float>(j * blockSize);
                 float y = static_cast<float>(i * blockSize);
 
+                //at first we set the equal as default
                 currentTile = nextTile = sf::Vector2f{ x, y };
 
                 ghostSprite.setPosition(currentTile);
