@@ -26,21 +26,21 @@ bool Lives::IsColliding(sf::FloatRect& pacman, sf::FloatRect& ghost)
     return false;
 }
 
-void Lives::CheckCollision(sf::RenderWindow& window, Pacman& pacman, Ghosts& blinky, Ghosts& pinky, Ghosts& inky, Ghosts& clyde)
+void Lives::CheckCollision(sf::RenderWindow& window, Pacman& pacman, Audio& audio, Ghosts& blinky, Ghosts& pinky, Ghosts& inky, Ghosts& clyde)
 {
-    for (int i = 0; i < lives; ++i) 
+    for (int i = 0; i < lives; ++i)
     {
         livesSprite.setPosition(sf::Vector2f(static_cast<float>(545 + (i * blockSize)), static_cast<float>(5)));
         window.draw(livesSprite);
     }
 
-    CheckGhost(pacman, blinky);
-    CheckGhost(pacman, pinky);
-    CheckGhost(pacman, inky);
-    CheckGhost(pacman, clyde);
+    CheckGhost(pacman, blinky, audio);
+    CheckGhost(pacman, pinky, audio);
+    CheckGhost(pacman, inky, audio);
+    CheckGhost(pacman, clyde, audio);
 }
 
-void Lives::CheckGhost(Pacman& pacman, Ghosts& ghost)
+void Lives::CheckGhost(Pacman& pacman, Ghosts& ghost, Audio& audio)
 {
     auto pacBounds = pacman.GetSprite().getGlobalBounds();
     auto ghostBounds = ghost.GetSprite().getGlobalBounds();
@@ -54,6 +54,7 @@ void Lives::CheckGhost(Pacman& pacman, Ghosts& ghost)
         lives--;
         pacman.Reset();
         pacman.ResetGhosts();
+        audio.UpdateSound(LoadAudio::EatGhost);
     }
 }
 

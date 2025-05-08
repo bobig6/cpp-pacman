@@ -3,27 +3,6 @@
 #include "Constants.h"
 #include "Score.h"
 #include "Timers.h"
-#include <iostream>
-
-sf::Vector2f WrapCoords(const sf::Vector2f& p)
-{
-    float sw = static_cast<float>(screenWidth);
-    float sh = static_cast<float>(screenHeight);
-
-    return { std::fmod(p.x + sw, sw), std::fmod(p.y + sh, sh) };
-}
-
-sf::Vector2i ConvertCoordinates(sf::Vector2f p)
-{
-
-    p = WrapCoords(p);
-
-    int c = static_cast<int>(p.x) / blockSize;
-    int r = static_cast<int>(p.y) / blockSize;
-
-    return sf::Vector2i{ r,c };
-}
-
 
 void Pacman::SetGhosts(Ghosts& blinky, Ghosts& pinky, Ghosts& inky, Ghosts& clyde)
 {
@@ -35,6 +14,8 @@ void Pacman::SetGhosts(Ghosts& blinky, Ghosts& pinky, Ghosts& inky, Ghosts& clyd
 
 void Pacman::EatFruits(sf::Vector2f p)
 {
+    audio.UpdateSound(LoadAudio::EatFood);
+
     sf::Vector2i indexes = ConvertCoordinates(p);
 
     maze[indexes.x][indexes.y] = ' ';
@@ -51,17 +32,17 @@ bool Pacman::HasEatenFruit(sf::Vector2f p)
 
 void Pacman::EatEnergizer(sf::Vector2f p)
 {
+
     sf::Vector2i indexes = ConvertCoordinates(p);
 
     maze[indexes.x][indexes.y] = ' ';
     currentScore++;
     eatenEnergizers++;
-
+    audio.UpdateSound(LoadAudio::EatFood);
 
     for (int i = 0; i < 4; i++)
     {
         ghosts[i]->setMode(GhostMode::Frightened);
-
     }
 }
 
@@ -74,11 +55,9 @@ bool Pacman::HasEatenEnergizer(sf::Vector2f p)
 
 void Pacman::EatGhost(Ghosts* ghost)
 {
-
     currentScore += 200;
-    std::cout << "Eaten ghost" << std::endl;
+    audio.UpdateSound(LoadAudio::EatGhost);
     ghost->ResetGhost();
-
 }
 
 
@@ -94,25 +73,6 @@ void Pacman::DrawPacman(sf::RenderWindow& window) //self explanatory
 
     // Restore the sprite's current position.
     pacmanSprite.setPosition(currentPosition);
-}
-
-sf::Vector2f GetNextTile(MoveDirection dir)
-{
-    switch (dir)
-    {
-    case MoveDirection::None:
-        return { 0, 0 };
-    case MoveDirection::Up:
-        return { 0, -32 };
-    case MoveDirection::Down:
-        return { 0, 32 };
-    case MoveDirection::Left:
-        return { -32, 0 };
-    case MoveDirection::Right:
-        return { 32, 0 };
-    }
-
-    return { 0, 0 };
 }
 
 // Return true if the tile is not blocked
@@ -160,6 +120,31 @@ void Pacman::UpdateAnimation(float deltaTime)
 
     int animationIndex = currentFrame + currentAnimationPosition;
     pacmanSprite.setTextureRect(sf::IntRect{ {animationIndex * 32 + 2, 0}, {28, 32} });
+}
+
+void Pacman::EndingAnimation(float deltaTime)
+{
+    if (!won)
+    {
+        won = true;
+
+        if (!pacmanTexture.loadFromFile("assets/ending.png")) {
+            return;
+        }
+        pacmanSprite.setTexture(pacmanTexture);
+        animationTimer = 0;
+        currentFrame = 0;
+    }
+
+    animationTimer += deltaTime; // we increase the value of the timer with deltaTime step
+    currentFrame = animationTimer * 10;
+
+    if (currentFrame > 11)
+    {
+        return;
+    }
+
+    pacmanSprite.setTextureRect(sf::IntRect{ {currentFrame * 38, 0}, {32, 32} });
 }
 
 bool Pacman::MoveTo(float deltaTime)
@@ -233,13 +218,7 @@ sf::Vector2f Pacman::GetPosition()
     return pacmanSprite.getPosition();
 }
 
-void Pacman::Die()
-{
-    //collision with ghosts always when not in booster
-
-}
-
-Pacman::Pacman() : pacmanTexture("assets/Pacman.png"), pacmanSprite(pacmanTexture, sf::IntRect{ {0,0}, {32,32} })
+Pacman::Pacman() : defaultTexture("assets/Pacman.png"), pacmanSprite(pacmanTexture, sf::IntRect{ {0,0}, {32,32} })
 {
     Reset();
 }
@@ -251,9 +230,10 @@ void Pacman::Reset()
     currentFrame = 0;
     animationTimer = 0;
 
-    eatenPellets = 0;
-    eatenEnergizers = 0;
+    won = false;
 
+    pacmanTexture = defaultTexture;
+    pacmanSprite.setTexture(pacmanTexture);
 
     for (int i = 0; i < rows; i++)
     {
@@ -270,6 +250,7 @@ void Pacman::Reset()
             }
         }
     }
+    pacmanSprite.setTextureRect(sf::IntRect{ {2, 0}, {28, 32} });
 }
 
 void Pacman::ResetGhosts()
